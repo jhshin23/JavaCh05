@@ -188,9 +188,9 @@ public class P03_07_Point {
 		System.out.println(q.toString() + "입니다.");
 		
 		
+		
 		Point3DColor p3c = new Point3DColor(10, 20, 30, "RED");
 		System.out.println(p3c.toString() + "입니다.");
-
 		
 		Point3DColor q3c = new Point3DColor(1, 2, 3, "BLUE");
 		p3c.move(q3c);
