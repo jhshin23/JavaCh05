@@ -98,6 +98,44 @@ class PositivePoint extends Point {
 
 }
 
+class Point3DColor extends Point {
+	private int z;
+	private String color;
+
+	public Point3DColor(int x, int y, int z, String color) {
+		super(x, y);
+		this.z = z;
+		this.color = color;
+	}
+	
+	public int getZ() { return z; }
+	public String getColor() { return color; }
+	
+	public void setColor(String color) {
+		this.color = color;
+	}
+	public void move(int x, int y, int z) { 
+		move(x, y); 
+		this.z = z;
+	}
+	
+	public void move(Point3DColor desP) { 
+		move(desP.getX(), desP.getY(), desP.getZ()); 
+		setColor(desP.getColor());
+	}
+	
+	@Override
+	public String toString() {
+		return "(" + getX() + "," + getY() + "," + getZ() + ")" + getColor() + "점";
+	}
+	
+	public boolean equals(Point3DColor p) {
+		if(getX() == p.getX() && getY() ==p.getY() && getColor() == p.getColor())
+			return true;
+		return false;
+	}
+}
+
 public class P03_07_Point {
 
 	public static void main(String[] args) {
@@ -148,6 +186,23 @@ public class P03_07_Point {
 		
 		PositivePoint q = new PositivePoint(-10, -10);
 		System.out.println(q.toString() + "입니다.");
+		
+		
+		Point3DColor p3c = new Point3DColor(10, 20, 30, "RED");
+		System.out.println(p3c.toString() + "입니다.");
+
+		
+		Point3DColor q3c = new Point3DColor(1, 2, 3, "BLUE");
+		p3c.move(q3c);
+		System.out.println(p3c.toString() + "입니다.");
+		
+		Point3DColor r3c = new Point3DColor(1, 2, 3, "BLUE");
+		
+		if(p3c.equals(r3c)) System.out.println("예. 같은 위치 같은 색깔의 점입니다.");
+		else System.out.println("아니오");
+		
 	}
+	
+	
 
 }
