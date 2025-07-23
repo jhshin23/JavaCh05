@@ -1,0 +1,17 @@
+
+# IDE-related
+.classpath
+.project
+.settings/
+
+# build output
+bin/
+
+# OS-specific
+*.DS_Store
+Thumbs.db
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
