@@ -130,7 +130,7 @@ class Point3DColor extends Point {
 	}
 	
 	public boolean equals(Point3DColor p) {
-		if(getX() == p.getX() && getY() ==p.getY() && getColor() == p.getColor())
+		if(getX() == p.getX() && getY() ==p.getY() && getColor().equals(p.getColor()))
 			return true;
 		return false;
 	}
