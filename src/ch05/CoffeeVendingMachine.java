@@ -1,7 +1,7 @@
 package ch05;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-
+//Page324, P08
 abstract class Box {
 	protected int size;
 	public Box(int size) {
@@ -30,6 +30,10 @@ class IngredientBox extends Box {
 		else 
 			return false;
 	}
+	
+	public void rollback() {
+		size++;
+	}
 
 	@Override
 	public void print() {
@@ -55,18 +59,20 @@ public class CoffeeVendingMachine {
 	private final int 커피 = 0;
 	private final int 프림 = 1;
 	private final int 설탕 = 2;
+	private final int 코코아 = 3;
 	private final int[][] recipe = { 
 			{ 커피, 프림, 설탕 },
 			{ 커피, 설탕 },
-			{ 커피 }	
+			{ 커피 },	 
+			{ 커피, 프림, 설탕, 코코아 }
 	};
 	
 	private boolean isExit = false;
 	
-	private final String[] menuName = { "다방커피", "설탕커피", "블랙커피" };
-	private final String[] IngredientName = { "커피", "프림", "설탕" };
+	private final String[] menuName = { "다방커피", "설탕커피", "블랙커피", "모카커피" };
+	private final String[] IngredientName = { "커피", "프림", "설탕", "코코아" };
 	private IngredientBox[] allBox = new IngredientBox[IngredientName.length];
-	
+
 	public CoffeeVendingMachine() {
 		for (int i = 0 ; i <  IngredientName.length ; i++) {
 			allBox[i] = new IngredientBox(IngredientName[i], INGREDIENT_INIT_SIZE);
@@ -93,21 +99,33 @@ public class CoffeeVendingMachine {
 		
 	}
 	
-	private void makeMenu(int menuNum) {
-		for (int i = 0 ; i < recipe[menuNum].length ; i++) {
-			if(allBox[recipe[menuNum][i]].isEmpty()) {
-				System.out.println("원료가 부족합니다");
-				return;
-			}
-		}
-		for (int i = 0 ; i < recipe[menuNum].length ; i++) {
-			allBox[recipe[menuNum][i]].consume();
+	private void rollback(int menuNum, int index) {
+		for(int i = 0 ; i < index ; i++) {
+			allBox[recipe[menuNum][i]].rollback();
 		}
 	}
 	
-	public void doByOrder(int optionNum) {
-		if (optionNum >= 1 && optionNum <= menuName.length)
+	private void makeMenu(int menuNum) {
+		for (int i = 0 ; i < recipe[menuNum].length ; i++) {
+			if(allBox[recipe[menuNum][i]].consume()) 
+				continue;
+			else {
+				rollback(menuNum, i);
+				System.out.println("원료 부족으로 인해 제조를 중단했습니다.");
+				return;
+			}
+		}
+	}
+	
+	public void receiveOrder(int optionNum) {
+		if (optionNum >= 1 && optionNum <= menuName.length) {
+			for(int i = 0 ; i < recipe[optionNum-1].length; i++)
+				if(allBox[recipe[optionNum-1][i]].isEmpty()) {
+					System.out.println("원료가 부족합니다");
+					return;
+				}
 			makeMenu(optionNum-1);
+		}
 		if (optionNum == menuName.length + 1) {
 			isExit = true;
 			System.out.println("청춘 커피 자판기 프로그램을 종료합니다");			
@@ -137,7 +155,7 @@ public class CoffeeVendingMachine {
 					continue;
 				}				
 			} while(true);
-			ccc.doByOrder(optionNum);
+			ccc.receiveOrder(optionNum);
 		}
 		
 		scanner.close();
