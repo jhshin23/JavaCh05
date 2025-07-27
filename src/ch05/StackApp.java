@@ -1,7 +1,7 @@
 package ch05;
 import java.util.Scanner;
 import java.util.InputMismatchException;
-
+//Page327, P11
 interface IStack {
 	int capacity();
 	int length();
