@@ -34,9 +34,14 @@ class Game {
 		
 	}
 	public void run() {
+		Player owner;
 		System.out.println("***** 묵찌빠 게임을 시작합니다. *****");
 		createPlayers();
 		gameStart();
+		owner = setOwner(players);
+		while(true) {
+			break;
+		}
 		scanner.close();
 	}
 	
@@ -47,9 +52,7 @@ class Game {
 		players[1] = new Computer(scanner.nextLine());
 		System.out.println(players.length + "명의 선수를 생성 완료하였습니다.");
 	}
-	
-	private void gameStart() {
-		Random r = new Random();
+	private void betHuman() {
 		System.out.print(players[0].getName() + ">>");
 		String inputBet = scanner.nextLine();
 		while(true) {
@@ -59,10 +62,19 @@ class Game {
 			}
 			else System.out.println("묵 찌 빠 중에서 다시 입력하세요. " );
 		}
-		inputBet = players[1].bet[r.nextInt(players[1].bet.length)];
-		players[1].lastBet = inputBet;
 	}
-	private Player setOwner(Player[] hucom) {
+	
+	private void betComputer() {
+		Random r = new Random();
+		players[1].lastBet = players[1].bet[r.nextInt(players[1].bet.length)];
+		System.out.println(players[1].getName() + ">> 결정하였습니다.");
+	}
+	private void gameStart() {
+		betHuman();
+		betComputer();
+	}
+	private Player setOwner(Player[] p) {
+		Player owner = null;
 		
 		return players[0];
 	}
