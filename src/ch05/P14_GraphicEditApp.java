@@ -1,12 +1,19 @@
 package ch05;
 import java.util.Scanner;
-//Page329, P14, P14_GraphicEditApp, delete() 작성중
+//Page329, P14, P14_GraphicEditApp, 작동, 그러나 정리 필요
 abstract class Shape {
 	private Shape next;
+	protected int orderNum;
 	public Shape() { next = null; }
 	public void setNext(Shape obj) { next = obj; }
 	public Shape getNext() { return next; }
 	public abstract void draw();
+	public int getOrderNum() {
+		return orderNum;
+	}
+	public void setOrderNum (int orderNum) {
+		this.orderNum = orderNum;
+	}
 }
 
 class Line extends Shape {
@@ -14,11 +21,20 @@ class Line extends Shape {
 	public void draw() {
 		System.out.println("Line");
 	}
+	
+	public Line(int orderNum) {
+		this.orderNum = orderNum;
+	}
+	
+
 }
 class Rect extends Shape {
 	@Override
 	public void draw() {
 		System.out.println("Rect");
+	}
+	public Rect(int orderNum) {
+		this.orderNum = orderNum;
 	}
 }
 class Circle extends Shape {
@@ -26,10 +42,14 @@ class Circle extends Shape {
 	public void draw() {
 		System.out.println("Circle");
 	}
+	public Circle(int orderNum) {
+		this.orderNum = orderNum;
+	}
 }
 
 class GraphicEditor {
 	private Shape startShape, last, obj2;
+	private int cnt = 1;
 	private boolean isExit = false;
 	
 	private String menu[] = {
@@ -38,7 +58,7 @@ class GraphicEditor {
 					"모두 보기",
 					"종료"
 	};
-	private String ShapeOption[] = {
+	private String shapeOption[] = {
 			"Line",
 			"Rect",
 			"Circle"
@@ -62,9 +82,9 @@ class GraphicEditor {
 		}		
 	}
 	public void printShapeOption() {
-		for(int i = 0 ; i < ShapeOption.length ; i++) {
-			System.out.print(ShapeOption[i] + "(" + (i+1) + ")");
-			if (i == ShapeOption.length-1) {
+		for(int i = 0 ; i < shapeOption.length ; i++) {
+			System.out.print(shapeOption[i] + "(" + (i+1) + ")");
+			if (i == shapeOption.length-1) {
 				System.out.print(">>");
 				break;
 			}	
@@ -96,32 +116,34 @@ class GraphicEditor {
 		if (startShape == null) {
 			switch (shapeNum) {
 			case 1:
-				startShape = new Line();
+				startShape = new Line(cnt);
 				break;
 			case 2:
-				startShape = new Rect();
+				startShape = new Rect(cnt);
 				break;
 			case 3:
-				startShape = new Circle();
+				startShape = new Circle(cnt);
 				break;
 				default:					
 			}
 			last = startShape;
+			cnt++;
 		} else {
 			switch (shapeNum) {
 			case 1:
-				obj2 = new Line();
+				obj2 = new Line(cnt);
 				break;
 			case 2:
-				obj2 = new Rect();
+				obj2 = new Rect(cnt);
 				break;
 			case 3:
-				obj2 = new Circle();
+				obj2 = new Circle(cnt);
 				break;
 				default:					
 			}
 			last.setNext(obj2);
 			last = obj2;
+			cnt++;
 		}
 	}
 	
@@ -138,13 +160,65 @@ class GraphicEditor {
 	}
 	
 	public void delete(int linkNum) {
-		
+		Shape p = startShape;
+		if(p != null && p.getOrderNum() == linkNum) {//1번을 지우려면
+			if(p.getNext() != null) {//1번 다음이 있으면
+				startShape = startShape.getNext();
+				startShape.setOrderNum(linkNum);
+				p = startShape.getNext();
+				cnt--;
+			}
+			else {//1번만 있고 그걸 지우려면
+				startShape = null;
+				cnt--;
+				return;
+			}
+			while (p != null) {//2번 이후도 있으면
+				linkNum++;
+				p.setOrderNum(linkNum);//순번을 당긴다
+				p = p.getNext();
+			}
+			return;
+		}
+		while (p != null && p.getNext() != null) {//다음 도형이 있고
+			if(p.getNext().getOrderNum() == linkNum) {//다음 도형이 삭제할 도형이고
+				if (p.getNext().getNext() != null) { //다다음 도형이 있으면
+					p.setNext(p.getNext().getNext());//다다음 도형에 연결한다
+					p = p.getNext(); //다다음 -> 다음이 된 도형을 가져와서
+					p.setOrderNum(linkNum);//순번 하나 당겨준다
+					p = p.getNext(); //다음 연결을 가져와서
+					cnt--;
+					while (p != null) {
+						linkNum++;
+						p.setOrderNum(linkNum);//순번을 당긴다
+						p = p.getNext();
+					}
+					return;
+				}
+				else {//다다음 도형은 없으며 마지막 도형을 삭제하는 거라면
+					p.setNext(null); //다음을 삭제
+					last = p;
+					cnt--;
+					return;
+				}
+				
+			}
+			else
+				p = p.getNext();
+		}
+		System.out.println("삭제할 수 없습니다.");
+	
 	}
 	
 	public void paintAll() {
 		Shape p = startShape;
+		if(startShape == null) {
+			System.out.println("그려둔 그림이 없습니다.");
+			return;
+		}
 		while (p != null) {
 			p.draw();
+			System.out.println(p.getOrderNum());
 			p = p.getNext();
 		}
 	}
@@ -165,6 +239,7 @@ public class P14_GraphicEditApp {
 				if(optionNum < 1 || optionNum > 4) continue;
 			} 
 			catch (NumberFormatException e) {
+				System.out.println("정수를 입력해주세요");
 				continue;
 			}
 			if(ge.start(optionNum)) {
@@ -177,6 +252,7 @@ public class P14_GraphicEditApp {
 						break;
 					} 
 					catch (NumberFormatException e) {
+						System.out.println("정수를 입력해주세요");
 						continue;
 					}
 				} while (true);
